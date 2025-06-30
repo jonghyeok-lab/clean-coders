@@ -40,3 +40,33 @@ class FileCommandTemplate {
 
 - 시트와 헤더를 추가하는 기능, byte[]로 export하는 기능, 행을 추가하는 기능이 있는 엑셀 파일 관련 클래스를 만들었다.
 - 해당 기능들을 Service(클라이언트)에서 순서대로 호출을 하도록 했는데 해당 클래스를 추상화 시키고, 템플릿 메서드를 제공하는 것이 더 나은 코드였음을 알게되었다.
+
+#### Tell Don`t Ask
+- 가장 좋아보이는 코드는 무엇인가?
+```
+1번
+if(user.isLoggedIn() {
+  user.execute();
+} else {
+  authenticator.promptLogin();
+}
+
+2번
+try {
+  user.execute(command);
+} catch (User.NotLoggedIn e) {
+  authenticator.promptLogin();
+}
+
+3번
+user.execute(command, authenticator)
+```
+
+- 로그인 여부 상태는 user 객체에 속한다. user상태를 가져다가 user를 대신해서 왜 결정을 해야하는가?
+- user가 user상태를 스스로 판단하고 스스로 행위를 하는 것이 옳은 3번이 가장 좋아보인다.
+
+#### return Null;
+- stack의 top() 이 스택의 사이즈가 있든 없든 해당 메서드 호출이 실패하는 것을 기대하지 않는다.
+  - 이럴 때는 스택의 값이 없을 때, top()을 호출하면 예외를 던지는게 낫다.
+- 하지만, stack의 일부 요소를 찾는 find()는 클라이언트가 실패할 기대를 하고 있다.
+  - 찾지 못할 때도 있을 테니까! -> 이럴 때는 null 을 반환해도 좋다.
